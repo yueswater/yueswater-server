@@ -32,20 +32,20 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "first_name", 
-            "last_name",  
+            "first_name",
+            "last_name",
             "bio",
             "avatar",
-            "avatar_url", 
+            "avatar_url",
             "date_joined",
             "is_active",
         )
-        
+
         read_only_fields = ("id", "email", "date_joined", "is_active")
 
     def get_avatar_url(self, obj):
         if obj.avatar:
-            request = self.context.get('request')
+            request = self.context.get("request")
             if request:
                 return request.build_absolute_uri(obj.avatar.url)
             return obj.avatar.url
