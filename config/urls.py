@@ -11,18 +11,17 @@ from newsletter.views import NewsletterViewSet
 from posts.views import CategoryViewSet, PostImageViewSet, PostViewSet, TagViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
 )
 from users.views import (
     ActivateAccountView,
-    LogoutView,
-    RegisterView,
-    TokenObtainPairView,
-    UserProfileView,
-    PasswordResetRequestView,
-    PasswordResetConfirmView,
     CustomTokenObtainPairView,
+    LogoutView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    RegisterView,
+    UserProfileView,
+    ChangePasswordView,
 )
 
 # 設定 Router
@@ -49,7 +48,9 @@ urlpatterns = [
     # 使用者認證
     path("api/auth/register/", RegisterView.as_view(), name="auth_register"),
     path("api/auth/me/", UserProfileView.as_view(), name="auth_me"),
-    path("api/auth/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path(
+        "api/auth/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"
+    ),
     path("api/auth/logout/", LogoutView.as_view(), name="auth_logout"),
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(
@@ -57,8 +58,17 @@ urlpatterns = [
         ActivateAccountView.as_view(),
         name="auth_verify_email",
     ),
-    path("api/auth/password-reset/", PasswordResetRequestView.as_view(), name="password_reset_request"),
-    path("api/auth/password-reset-confirm/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path(
+        "api/auth/password-reset/",
+        PasswordResetRequestView.as_view(),
+        name="password_reset_request",
+    ),
+    path(
+        "api/auth/password-reset-confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path("api/auth/change-password/", ChangePasswordView.as_view(), name="auth_change_password"),
 ]
 
 # 圖片與靜態檔案設定
