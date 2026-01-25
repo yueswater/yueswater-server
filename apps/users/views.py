@@ -90,12 +90,19 @@ class ActivateAccountView(APIView):
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
-        if user is not None and default_token_generator.check_token(user, token):
-            user.is_active = True
-            user.save()
-            return Response(
-                {"detail": "Account activated successfully."}, status=status.HTTP_200_OK
-            )
+        if user is not None:
+            if user.is_active:
+                return Response(
+                    {"detail": "already_active"}, status=status.HTTP_200_OK
+                )
+            
+            if default_token_generator.check_token(user, token):
+                user.is_active = True
+                user.save()
+                return Response(
+                    {"detail": "activated"}, status=status.HTTP_200_OK
+                )
+                
         return Response(
             {"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST
         )
