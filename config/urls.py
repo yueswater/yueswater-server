@@ -15,8 +15,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-# 引入 Views
-from users.views import LogoutView, RegisterView, TokenObtainPairView, UserProfileView
+from users.views import LogoutView, RegisterView, TokenObtainPairView, UserProfileView, ActivateAccountView
 
 # 設定 Router
 router = DefaultRouter()
@@ -45,6 +44,7 @@ urlpatterns = [
     path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/logout/", LogoutView.as_view(), name="auth_logout"),
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/auth/verify-email/", ActivateAccountView.as_view(), name="auth_verify_email"),
 ]
 
 # 圖片與靜態檔案設定
