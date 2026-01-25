@@ -22,6 +22,7 @@ from users.views import (
     UserProfileView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
+    CustomTokenObtainPairView,
 )
 
 # 設定 Router
@@ -48,7 +49,7 @@ urlpatterns = [
     # 使用者認證
     path("api/auth/register/", RegisterView.as_view(), name="auth_register"),
     path("api/auth/me/", UserProfileView.as_view(), name="auth_me"),
-    path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/auth/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/logout/", LogoutView.as_view(), name="auth_logout"),
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(
