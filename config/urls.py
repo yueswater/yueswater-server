@@ -15,13 +15,13 @@ from rest_framework_simplejwt.views import (
 )
 from users.views import (
     ActivateAccountView,
+    ChangePasswordView,
     CustomTokenObtainPairView,
     LogoutView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
     RegisterView,
     UserProfileView,
-    ChangePasswordView,
 )
 
 # 設定 Router
@@ -68,7 +68,11 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
-    path("api/auth/change-password/", ChangePasswordView.as_view(), name="auth_change_password"),
+    path(
+        "api/auth/change-password/",
+        ChangePasswordView.as_view(),
+        name="auth_change_password",
+    ),
 ]
 
 # 圖片與靜態檔案設定
