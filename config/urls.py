@@ -25,7 +25,7 @@ from users.views import (
 )
 
 # 設定 Router
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 router.register(r"posts", PostViewSet)
 router.register(r"upload", PostImageViewSet)
 router.register(r"categories", CategoryViewSet)
