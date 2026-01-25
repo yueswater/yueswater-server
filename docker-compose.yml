@@ -1,0 +1,21 @@
+services:
+  web:
+    container_name: yueswater-server
+    build: .
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+    ports:
+      - "8088:8088"
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8088
+    networks:
+      - yueswater-network
+
+networks:
+  yueswater-network:
+    external: true
+
+volumes:
+  static_volume:

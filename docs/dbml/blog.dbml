@@ -1,0 +1,86 @@
+Table posts {
+  id integer [primary key]
+  author_id integer [ref: > users.id, not null]
+  title varchar [not null]
+  slug varchar [unique, not null]
+  content text [not null]
+  excerpt text
+  cover_image_url varchar
+  is_draft boolean [not null, default: true]
+  is_archived boolean [not null, default: false]
+  is_published boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  published_at datetime [not null]
+}
+
+Table categories {
+  id integer [primary key]
+  name varchar [unique, not null]
+  description text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table tags {
+  id integer [primary key]
+  name varchar [not null]
+  description text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table post_categories {
+  post_id integer [ref: > posts.id, not null]
+  category_id integer [ref: > categories.id, not null]
+
+  indexes {
+    (post_id, category_id) [unique]
+  }
+}
+
+Table post_tags {
+  post_id integer [ref: > posts.id, not null]
+  tag_id integer [ref: > tags.id, not null]
+
+  indexes {
+    (post_id, tag_id) [unique]
+  }
+}
+
+Table users {
+  id integer [primary key]
+  username varchar [unique, not null]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  is_staff boolean [not null, default: false]
+  is_superuser boolean [not null, default: false]
+  is_active boolean [not null, default: true]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  bio text
+  avatar_url varchar
+}
+
+Table post_likes {
+  id integer [primary key]
+  post_id integer [ref: > posts.id, not null]
+  user_id integer [ref: > users.id, not null]
+
+  created_at datetime [not null]
+
+  indexes {
+    (post_id, user_id) [unique]
+  }
+}
+
+Table post_comments {
+  id integer [primary key]
+  post_id integer [ref: > posts.id, not null]
+  user_id integer [ref: > users.id, not null]
+
+  content text [not null]
+
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
