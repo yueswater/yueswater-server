@@ -92,17 +92,13 @@ class ActivateAccountView(APIView):
 
         if user is not None:
             if user.is_active:
-                return Response(
-                    {"detail": "already_active"}, status=status.HTTP_200_OK
-                )
-            
+                return Response({"detail": "already_active"}, status=status.HTTP_200_OK)
+
             if default_token_generator.check_token(user, token):
                 user.is_active = True
                 user.save()
-                return Response(
-                    {"detail": "activated"}, status=status.HTTP_200_OK
-                )
-                
+                return Response({"detail": "activated"}, status=status.HTTP_200_OK)
+
         return Response(
             {"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -135,3 +131,80 @@ class LogoutView(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {"error": "請提供電子郵件"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(email=email)
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_link = (
+                f"https://www.yueswater.com/reset-password?uid={uid}&token={token}"
+            )
+
+            subject = "【岳氏礦泉水】密碼重置請求"
+            context = {
+                "username": user.username,
+                "reset_link": reset_link,
+                "current_year": timezone.now().year,
+            }
+
+            html_content = render_to_string("users/password_reset_email.html", context)
+            text_content = strip_tags(html_content)
+
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[user.email],
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=False)
+
+            return Response({"detail": "密碼重設信件已寄出"}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+
+            return Response({"detail": "密碼重設信件已寄出"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uidb64 = request.data.get("uid")
+        token = request.data.get("token")
+        new_password = request.data.get("new_password")
+
+        if not all([uidb64, token, new_password]):
+            return Response(
+                {"error": "缺少必要欄位"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.set_password(new_password)
+            user.save()
+            return Response({"detail": "密碼已成功重設"}, status=status.HTTP_200_OK)
+
+        return Response(
+            {"error": "連結無效或已過期"}, status=status.HTTP_400_BAD_REQUEST
+        )
