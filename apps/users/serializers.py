@@ -24,6 +24,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -31,23 +32,27 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
+            "first_name", 
+            "last_name",  
             "bio",
             "avatar",
+            "avatar_url", 
             "date_joined",
             "is_active",
         )
+        
+        read_only_fields = ("id", "email", "date_joined", "is_active")
 
-    def get_avatar(self, obj):
-        if not obj.avatar:
-            return None
-        return obj.avatar.url
+    def get_avatar_url(self, obj):
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    客製化 JWT 登入回傳內容，加入使用者資訊與 Avatar
-    """
-
     def validate(self, attrs):
 
         data = super().validate(attrs)
@@ -55,6 +60,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["user_id"] = self.user.id
         data["username"] = self.user.username
         data["email"] = self.user.email
+        data["first_name"] = self.user.first_name
+        data["last_name"] = self.user.last_name
 
         if self.user.avatar:
 
