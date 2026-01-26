@@ -157,22 +157,28 @@ class BookmarkViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=["get"])
     def my_list(self, request):
-        bookmarks = PostBookmark.objects.filter(user=request.user).select_related(
-            "post", "post__category"
-        ).prefetch_related("post__tags")
-        
+        bookmarks = (
+            PostBookmark.objects.filter(user=request.user)
+            .select_related("post", "post__category")
+            .prefetch_related("post__tags")
+        )
+
         data = []
         for b in bookmarks:
-            data.append({
-                "id": b.id,
-                "title": b.post.title,
-                "slug": b.post.slug,
-                "created_at": b.created_at,
-                "post": {
-                    "category": {
-                        "name": b.post.category.name if b.post.category else "未分類"
+            data.append(
+                {
+                    "id": b.id,
+                    "title": b.post.title,
+                    "slug": b.post.slug,
+                    "created_at": b.created_at,
+                    "post": {
+                        "category": {
+                            "name": (
+                                b.post.category.name if b.post.category else "未分類"
+                            )
+                        },
+                        "tags": [{"name": t.name} for t in b.post.tags.all()],
                     },
-                    "tags": [{"name": t.name} for t in b.post.tags.all()]
                 }
-            })
+            )
         return Response(data)

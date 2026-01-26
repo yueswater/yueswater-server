@@ -127,7 +127,7 @@ class PostBookmark(models.Model):
         db_table = "post_bookmarks"
         verbose_name = "文章收藏"
         verbose_name_plural = "文章收藏列表"
-        # 確保同一個使用者不會重複收藏同一篇文章
+
         unique_together = ("user", "post")
         ordering = ["-created_at"]
 

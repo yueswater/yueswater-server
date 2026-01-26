@@ -6,7 +6,7 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
 )
-from interactions.views import CommentViewSet, LikeViewSet, BookmarkViewSet
+from interactions.views import BookmarkViewSet, CommentViewSet, LikeViewSet
 from newsletter.views import NewsletterViewSet
 from posts.views import CategoryViewSet, PostImageViewSet, PostViewSet, TagViewSet
 from rest_framework.routers import DefaultRouter
