@@ -1,3 +1,5 @@
+include .env
+
 .PHONY: help install shell run migrations migrate superuser format lint check clean tree \
         docker-up docker-down docker-logs docker-shell docker-migrate \
         docker-makemigrations docker-superuser docker-restart docker-clean
@@ -12,7 +14,7 @@ shell:
 	poetry shell
 
 run:
-	poetry run python manage.py runserver
+	poetry run python manage.py runserver 0.0.0.0:$(PORT)
 
 migrations:
 	poetry run python manage.py makemigrations
@@ -52,6 +54,9 @@ docker-down:
 
 docker-logs:
 	docker-compose logs -f
+
+docker-up-debug:
+	docker-compose up --build
 
 docker-shell:
 	docker-compose exec web /bin/bash

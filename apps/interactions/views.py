@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from utils.network import get_client_ip
 
-from .models import PostComment, PostLike
-from .serializers import CommentSerializer, LikeSerializer
+from .models import PostBookmark, PostComment, PostLike
+from .serializers import BookmarkSerializer, CommentSerializer, LikeSerializer
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -105,3 +105,74 @@ class LikeViewSet(viewsets.GenericViewSet):
             ).exists()
 
         return Response({"liked": is_liked, "likes_count": post.likes.count()})
+
+
+class BookmarkViewSet(viewsets.GenericViewSet):
+    queryset = PostBookmark.objects.all()
+    serializer_class = BookmarkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["post"])
+    def toggle(self, request):
+        post_id = request.data.get("post")
+        if not post_id:
+            return Response(
+                {"error": "文章 ID 是必填項"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({"error": "找不到該文章"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        bookmark_query = PostBookmark.objects.filter(post=post, user=user)
+
+        if bookmark_query.exists():
+            bookmark_query.delete()
+            bookmarked = False
+        else:
+            PostBookmark.objects.create(post=post, user=user)
+            bookmarked = True
+
+        return Response({"bookmarked": bookmarked})
+
+    @action(detail=False, methods=["get"])
+    def status(self, request):
+        post_id = request.query_params.get("post_id")
+        if not post_id:
+            return Response(
+                {"error": "文章 ID 是必填項"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({"error": "找不到該文章"}, status=status.HTTP_404_NOT_FOUND)
+
+        is_bookmarked = PostBookmark.objects.filter(
+            post=post, user=request.user
+        ).exists()
+        return Response({"bookmarked": is_bookmarked})
+
+    @action(detail=False, methods=["get"])
+    def my_list(self, request):
+        bookmarks = PostBookmark.objects.filter(user=request.user).select_related(
+            "post", "post__category"
+        ).prefetch_related("post__tags")
+        
+        data = []
+        for b in bookmarks:
+            data.append({
+                "id": b.id,
+                "title": b.post.title,
+                "slug": b.post.slug,
+                "created_at": b.created_at,
+                "post": {
+                    "category": {
+                        "name": b.post.category.name if b.post.category else "未分類"
+                    },
+                    "tags": [{"name": t.name} for t in b.post.tags.all()]
+                }
+            })
+        return Response(data)

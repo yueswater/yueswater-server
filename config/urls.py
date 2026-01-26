@@ -6,7 +6,7 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
 )
-from interactions.views import CommentViewSet, LikeViewSet
+from interactions.views import CommentViewSet, LikeViewSet, BookmarkViewSet
 from newsletter.views import NewsletterViewSet
 from posts.views import CategoryViewSet, PostImageViewSet, PostViewSet, TagViewSet
 from rest_framework.routers import DefaultRouter
@@ -32,7 +32,8 @@ router.register(r"categories", CategoryViewSet)
 router.register(r"tags", TagViewSet)
 router.register(r"comments", CommentViewSet)
 router.register(r"likes", LikeViewSet)
-router.register(r"newsletter", NewsletterViewSet, basename="newsletter")
+router.register(r"bookmarks", BookmarkViewSet)
+router.register(r"newsletter", NewsletterViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

@@ -6,9 +6,9 @@ from posts.models import Post
 
 
 class PostLike(models.Model):
-    # 按讚 UUID
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # 按讚資訊
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -35,13 +35,11 @@ class PostLike(models.Model):
         unique_together = ("post", "user")
         ordering = ["-created_at"]
         constraints = [
-            # 登入使用者：每個文章只能按一次
             models.UniqueConstraint(
                 fields=["user", "post"],
                 name="unique_user_like",
                 condition=models.Q(user__isnull=False),
             ),
-            # 匿名使用者：每個 IP 對每個文章只能按一次
             models.UniqueConstraint(
                 fields=["ip_address", "post"],
                 name="unique_ip_like",
@@ -54,9 +52,9 @@ class PostLike(models.Model):
 
 
 class PostView(models.Model):
-    # 瀏覽 UUID
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # 瀏覽資訊
+
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -72,7 +70,7 @@ class PostView(models.Model):
         db_table = "post_views"
         verbose_name = "文章瀏覽"
         verbose_name_plural = "文章瀏覽列表"
-        unique_together = ("post", "ip_address")  # 每個 IP 每篇文章只算一次
+        unique_together = ("post", "ip_address")
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -80,9 +78,9 @@ class PostView(models.Model):
 
 
 class PostComment(models.Model):
-    # 留言 UUID
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # 留言資訊
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -107,3 +105,31 @@ class PostComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} 在 {self.post.title[:10]} 上留言"
+
+
+class PostBookmark(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        verbose_name="收藏者",
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        verbose_name="收藏文章",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="收藏時間")
+
+    class Meta:
+        db_table = "post_bookmarks"
+        verbose_name = "文章收藏"
+        verbose_name_plural = "文章收藏列表"
+        # 確保同一個使用者不會重複收藏同一篇文章
+        unique_together = ("user", "post")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} 收藏了 {self.post.title[:10]}"
