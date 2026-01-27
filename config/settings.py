@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-lx0z$c8s8b5o)*#w6e-!(_1kc49ep2!o!7gn!s&7pr%%j3(znj"
 )
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", "172.17.1.148"]
 USE_X_FORWARDED_PORT = True
 
 INSTALLED_APPS = [
