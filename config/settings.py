@@ -68,6 +68,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://yueswater.com",
     "https://www.yueswater.com",
     "https://yueswater-server.onrender.com",
+    "https://yueswater-blog-server.onrender.com",
 ]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

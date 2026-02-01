@@ -31,8 +31,8 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = "slug"  # 網址用 slug 而不是 id
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    lookup_field = "slug"  
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -44,7 +44,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_object()
         user = request.user
 
-        # 如果已經讚過，就取消讚 (Toggle)
+        
         like_obj, created = PostLike.objects.get_or_create(user=user, post=post)
 
         if not created:
@@ -88,14 +88,14 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all().order_by("-created_at")
     serializer_class = PostImageSerializer
-    permission_classes = [permissions.IsAuthenticated]  # 只有登入者能上傳
-    parser_classes = [MultiPartParser, FormParser]  # 支援 multipart/form-data
+    permission_classes = [permissions.IsAuthenticated]  
+    parser_classes = [MultiPartParser, FormParser]  
 
     def perform_create(self, serializer):
-        # 嘗試從 slug 找出對應的文章
+        
         slug = serializer.validated_data.get("slug")
 
-        # 寫入 Log
+        
         logger.info(
             f"Image Uploading... User: {self.request.user}, Slug provided: {slug}"
         )
@@ -108,5 +108,5 @@ class PostImageViewSet(viewsets.ModelViewSet):
                     f"Image Upload: Slug '{slug}' found but no matching Post."
                 )
 
-        # 儲存
+        
         serializer.save(post=post)
