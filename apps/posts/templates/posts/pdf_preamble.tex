@@ -1,0 +1,92 @@
+\usepackage{multirow,array,float,caption,xcolor,indentfirst,titlesec,enumitem,xeCJK,fontspec,tcolorbox}
+\tcbuselibrary{listings,breakable,skins}
+\usepackage{fontawesome5}
+
+\captionsetup{
+  figurename=圖,
+  tablename=表
+}
+
+\definecolor{myblue}{HTML}{81a1c1}
+\definecolor{ad-note}{HTML}{5e81ac}
+\definecolor{ad-question}{HTML}{bf616a}
+\definecolor{ad-warning}{HTML}{fcb700}
+
+\setlist[enumerate]{leftmargin=2em, label=(\arabic*), itemindent=0pt, listparindent=2em, parsep=0pt, topsep=0pt}
+\defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
+
+\setCJKmainfont[UprightFont=*, BoldFont=cwTeX Q HeiZH, ItalicFont=cwTeX Q KaiZH]{cwTeX Q MingZH}
+\setCJKmonofont{cwTeX Q MingZH}
+\setCJKsansfont{cwTeX Q HeiZH}
+
+\setCJKfamilyfont{kai}{cwTeX Q KaiZH}
+\newcommand{\kai}[1]{{\CJKfamily{kai}#1}}
+\setCJKfamilyfont{hei}{cwTeX Q HeiZH}
+\newcommand{\hei}[1]{{\CJKfamily{hei}#1}}
+
+\setmainfont{Sabon}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\titleformat{\section}[hang]{\LARGE\bfseries\hei}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\Large\bfseries\hei}{\thesubsection}{1em}{}
+
+
+\tcbset{
+  admonitionstyle/.style={
+    breakable,
+    enhanced,
+    boxrule=0.5pt,
+    leftrule=4pt,      
+    arc=2pt,           
+    outer arc=2pt,
+    left=10pt,         
+    right=10pt,
+    top=8pt,
+    bottom=8pt,
+    toptitle=5pt,      
+    bottomtitle=5pt,   
+    sharp corners=downhill, 
+    coltitle=white,
+    fonttitle=\bfseries\hei,
+    before skip=1.5em,
+    after skip=1.5em,
+  }
+}
+
+\newtcolorbox{note}[1]{
+  admonitionstyle,
+  colback=ad-note!5!white,
+  colframe=ad-note,
+  title={\faInfoCircle\ \ #1}
+}
+
+\newtcolorbox{question}[1]{
+  admonitionstyle,
+  colback=ad-question!5!white,
+  colframe=ad-question,
+  title={\faQuestionCircle\ \ #1}
+}
+
+\newtcolorbox{warning}[1]{
+  admonitionstyle,
+  colback=ad-warning!5!white,
+  colframe=ad-warning,
+  title={\faExclamationTriangle\ \ #1}
+}
+
+\makeatletter
+\renewcommand{\maketitle}{
+  \begin{center}
+    {\Huge \hei \@title \par} \vskip 1.5em
+    {\large \kai \@author \par} \vskip 0.5em
+    {\normalsize \@date \par} \vskip 2em
+  \end{center}
+}
+\makeatother
+
+\renewcommand{\baselinestretch}{1.3}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.5em}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
+\renewcommand{\contentsname}{\hei{目錄}}

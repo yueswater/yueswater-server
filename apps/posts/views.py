@@ -1,12 +1,17 @@
 import logging
 
 from django.db.models import Count
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.views import View
 from interactions.models import PostLike, PostView
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+
+from utils.pdf_handler import convert_post_to_pdf
 
 from .models import Category, Post, PostImage, Tag
 from .serializers import (
@@ -20,8 +25,6 @@ logger = logging.getLogger("apps")
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
-    """自定義權限：只有作者可以編輯/刪除，其他人只能看"""
-
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -32,7 +35,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    lookup_field = "slug"  
+    lookup_field = "slug"
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -44,7 +47,6 @@ class PostViewSet(viewsets.ModelViewSet):
         post = self.get_object()
         user = request.user
 
-        
         like_obj, created = PostLike.objects.get_or_create(user=user, post=post)
 
         if not created:
@@ -54,7 +56,6 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response({"status": "liked"})
 
     def get_client_ip(self, request):
-        """取得用戶 IP"""
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
             ip = x_forwarded_for.split(",")[0]
@@ -73,6 +74,18 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response({"status": "viewed"})
 
 
+class PostPDFDownloadView(View):
+    def get(self, request, slug, *args, **kwargs):
+        try:
+            post = get_object_or_404(Post, slug=slug)
+            pdf_content = convert_post_to_pdf(post)
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{post.slug}.pdf"'
+            return response
+        except Exception as e:
+            return HttpResponse(str(e), status=500)
+
+
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.annotate(count=Count("posts")).order_by("-count")
     serializer_class = CategorySerializer
@@ -88,14 +101,13 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostImageViewSet(viewsets.ModelViewSet):
     queryset = PostImage.objects.all().order_by("-created_at")
     serializer_class = PostImageSerializer
-    permission_classes = [permissions.IsAuthenticated]  
-    parser_classes = [MultiPartParser, FormParser]  
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
-        
+
         slug = serializer.validated_data.get("slug")
 
-        
         logger.info(
             f"Image Uploading... User: {self.request.user}, Slug provided: {slug}"
         )
@@ -108,5 +120,4 @@ class PostImageViewSet(viewsets.ModelViewSet):
                     f"Image Upload: Slug '{slug}' found but no matching Post."
                 )
 
-        
         serializer.save(post=post)

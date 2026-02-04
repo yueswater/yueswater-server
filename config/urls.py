@@ -8,7 +8,13 @@ from drf_spectacular.views import (
 )
 from interactions.views import BookmarkViewSet, CommentViewSet, LikeViewSet
 from newsletter.views import NewsletterViewSet
-from posts.views import CategoryViewSet, PostImageViewSet, PostViewSet, TagViewSet
+from posts.views import (
+    CategoryViewSet,
+    PostImageViewSet,
+    PostPDFDownloadView,
+    PostViewSet,
+    TagViewSet,
+)
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -73,6 +79,11 @@ urlpatterns = [
         "api/auth/change-password/",
         ChangePasswordView.as_view(),
         name="auth_change_password",
+    ),
+    path(
+        "api/posts/<slug:slug>/download-pdf/",
+        PostPDFDownloadView.as_view(),
+        name="post-pdf-download",
     ),
 ]
 
