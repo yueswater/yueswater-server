@@ -8,9 +8,12 @@
 }
 
 \definecolor{myblue}{HTML}{81a1c1}
-\definecolor{ad-note}{HTML}{5e81ac}
-\definecolor{ad-question}{HTML}{bf616a}
-\definecolor{ad-warning}{HTML}{fcb700}
+\definecolor{ad-note}{HTML}{448aff}
+\definecolor{ad-question}{HTML}{64dd17}
+\definecolor{ad-info}{HTML}{06b8d4}
+\definecolor{ad-tip}{HTML}{01bfa5}
+\definecolor{ad-example}{HTML}{7d4dff}
+\definecolor{ad-warning}{HTML}{ff9101}
 
 \setlist[enumerate]{leftmargin=2em, label=(\arabic*), itemindent=0pt, listparindent=2em, parsep=0pt, topsep=0pt}
 \defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
@@ -59,6 +62,27 @@
   colback=ad-note!5!white,
   colframe=ad-note,
   title={\faInfoCircle\ \ #1}
+}
+
+\newtcolorbox{info}[1]{
+  admonitionstyle,
+  colback=ad-info!5!white,
+  colframe=ad-info,
+  title={\faInfoCircle\ \ #1}
+}
+
+\newtcolorbox{tip}[1]{
+  admonitionstyle,
+  colback=ad-tip!5!white,
+  colframe=ad-tip,
+  title={\faLightbulb\ \ #1}
+}
+
+\newtcolorbox{example}[1]{
+  admonitionstyle,
+  colback=ad-example!5!white,
+  colframe=ad-example,
+  title={\faFlask\ \ #1}
 }
 
 \newtcolorbox{question}[1]{

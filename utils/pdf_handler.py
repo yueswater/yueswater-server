@@ -17,13 +17,11 @@ def convert_post_to_pdf(post):
         ad_type = match.group(1)
         title = match.group(2)
         body = match.group(3).strip()
-        # 轉換內部的 Markdown 粗體為 LaTeX \textbf
         body = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', body)
-        # 轉換內部的 Markdown 行內代碼為 LaTeX \texttt
         body = re.sub(r'`(.*?)`', r'\\texttt{\1}', body)
         return f"\n\\begin{{{ad_type}}}{{{title}}}\n{body}\n\\end{{{ad_type}}}\n"
 
-    pattern = r":::\s*(note|warning|question)\{title=\"(.*?)\"\}\s*(.*?)\s*:::"
+    pattern = r":::\s*(note|warning|question|tip|info|example)\{title=\"(.*?)\"\}\s*(.*?)\s*:::"
     content = re.sub(pattern, replace_admonition, content, flags=re.DOTALL)
     
     def replace_simple(match):
@@ -33,7 +31,7 @@ def convert_post_to_pdf(post):
         body = re.sub(r'`(.*?)`', r'\\texttt{\1}', body)
         return f"\n\\begin{{{ad_type}}}{{{ad_type.upper()}}}\n{body}\n\\end{{{ad_type}}}\n"
     
-    simple_pattern = r":::\s*(note|warning|question)\s*(.*?)\s*:::"
+    simple_pattern = r":::\s*(note|warning|question|tip|info|example)\s*(.*?)\s*:::"
     content = re.sub(simple_pattern, replace_simple, content, flags=re.DOTALL)
 
     cmd = [
