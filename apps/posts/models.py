@@ -1,5 +1,5 @@
 import uuid
-
+from django.utils import timezone
 from django.conf import settings
 from django.db import models
 
@@ -59,7 +59,7 @@ class Post(models.Model):
     cover_image = models.ImageField(
         upload_to="covers/", blank=True, null=True, help_text="文章縮圖"
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="建立時間")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="建立時間")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新時間")
     published_at = models.DateTimeField(blank=True, null=True, verbose_name="發布時間")
 

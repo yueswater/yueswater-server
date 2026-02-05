@@ -21,12 +21,12 @@ class TagAdmin(ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(ModelAdmin):
-    # 列表顯示
     list_display = (
         "title",
         "author",
         "status_badge",
         "created_at",
+        "updated_at",
         "is_draft",
         "is_published",
         "is_archived",
@@ -34,23 +34,36 @@ class PostAdmin(ModelAdmin):
         "get_like_count",
         "category",
     )
-    # 進入編輯
     list_display_links = ("title",)
-    # 搜尋
     search_fields = ("title", "content", "slug")
-    # 過濾器
     list_filter = ("is_published", "is_archived", "created_at", "category")
-    # 自動填入 Slug
     prepopulated_fields = {"slug": ("title",)}
-    # 唯讀欄位
+    
+    
     readonly_fields = [
         "uuid",
-        "created_at",
         "updated_at",
         "get_view_count",
         "get_like_count",
     ]
-    # 使用 SimpleMDE 編輯器
+
+    
+    fields = (
+        "title",
+        "slug",
+        "author",
+        "category",
+        "tags",
+        "cover_image",
+        "content",
+        "excerpt",
+        "created_at",  
+        "updated_at",
+        "is_published",
+        "is_archived",
+        "uuid",
+    )
+
     formfield_overrides = {
         models.TextField: {"widget": SimpleMDEEditor},
     }
@@ -58,7 +71,6 @@ class PostAdmin(ModelAdmin):
     class Media:
         css = {"all": ("css/admin_fix.css",)}
 
-    # 顯示狀態
     @display(description="狀態", label=True)
     def status_badge(self, obj):
         if obj.is_archived:
@@ -67,12 +79,10 @@ class PostAdmin(ModelAdmin):
             return "已發布", "success"
         return "草稿", "info"
 
-    # 瀏覽次數
     @display(description="瀏覽次數")
     def get_view_count(self, obj):
         return obj.views.count()
 
-    # 按讚次數
     @display(description="按讚次數")
     def get_like_count(self, obj):
         return obj.likes.count()
