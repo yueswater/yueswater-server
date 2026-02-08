@@ -3,7 +3,9 @@ import logging
 from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from interactions.models import PostLike, PostView
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -11,6 +13,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from utils.latex_handler import compile_latex_to_pdf
 from utils.pdf_handler import convert_post_to_pdf
 
 from .models import Category, Post, PostImage, Tag
@@ -72,6 +75,26 @@ class PostViewSet(viewsets.ModelViewSet):
         PostView.objects.get_or_create(post=post, ip_address=ip)
 
         return Response({"status": "viewed"})
+
+    @method_decorator(csrf_exempt)
+    @action(detail=False, methods=["post"], permission_classes=[permissions.AllowAny])
+    def compile_latex(self, request):
+        tex_code = request.data.get("code")
+        lang = request.data.get("lang", "zh")
+
+        if not tex_code:
+            return Response({"detail": "No code provided"}, status=400)
+
+        pdf_content, error_log = compile_latex_to_pdf(tex_code, lang=lang)
+
+        if pdf_content:
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = 'inline; filename="preview.pdf"'
+            return response
+        else:
+            return Response(
+                {"detail": "LaTeX Compilation Error", "log": error_log}, status=400
+            )
 
 
 class PostPDFDownloadView(View):

@@ -1,7 +1,8 @@
 import uuid
-from django.utils import timezone
+
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from utils.image_handler import post_image_upload_path
 

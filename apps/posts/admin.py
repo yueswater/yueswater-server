@@ -38,8 +38,7 @@ class PostAdmin(ModelAdmin):
     search_fields = ("title", "content", "slug")
     list_filter = ("is_published", "is_archived", "created_at", "category")
     prepopulated_fields = {"slug": ("title",)}
-    
-    
+
     readonly_fields = [
         "uuid",
         "updated_at",
@@ -47,7 +46,6 @@ class PostAdmin(ModelAdmin):
         "get_like_count",
     ]
 
-    
     fields = (
         "title",
         "slug",
@@ -57,7 +55,7 @@ class PostAdmin(ModelAdmin):
         "cover_image",
         "content",
         "excerpt",
-        "created_at",  
+        "created_at",
         "updated_at",
         "is_published",
         "is_archived",
