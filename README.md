@@ -1,6 +1,6 @@
 # Yueswater Blog Backend
 
-This is the core backend engine for [Yue's Water](https://www.yueswater.com/), built on [Python Django](https://www.djangoproject.com/) and [Django REST Framework](https://www.django-rest-framework.org/). It supports article management, Markdown rendering, reactions, comments, sharing, image uploads, and JWT-based authentication.
+This is the core backend engine for [Yueswater](https://www.yueswater.com/), built on [Python Django](https://www.djangoproject.com/) and [Django REST Framework](https://www.django-rest-framework.org/). It supports article management, Markdown rendering, reactions, comments, sharing, image uploads, and JWT-based authentication.
 
 ## Tech Stack
 
